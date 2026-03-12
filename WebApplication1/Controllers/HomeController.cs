@@ -11,6 +11,21 @@ namespace WebApplication1.Controllers
             return View();
         }
 
+        public IActionResult Cenik()
+        {
+            return View();
+        }
+
+        public IActionResult Kontakty()
+        {
+            return View();
+        }
+
+        public IActionResult Programy()
+        {
+            return View();
+        }
+
         public IActionResult Privacy()
         {
             return View();

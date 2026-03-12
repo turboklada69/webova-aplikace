@@ -1,60 +1,60 @@
 using Microsoft.AspNetCore.Mvc;
+using WebApplication1.Models;
 
 namespace WebApplication1.Controllers
 {
     public class UserController : Controller
     {
-        // GET /User/Register
-        [HttpGet]
+        private readonly AppDbContext _context;
+
+        public UserController(AppDbContext context)
+        {
+            _context = context;
+        }
+
         public IActionResult Register()
         {
             return View();
         }
 
-        // POST /User/Register
         [HttpPost]
-        public IActionResult Register(string username, string email, string password)
+        public IActionResult Register(User user)
         {
-            // TODO: uložit uživatele do databáze, zahashovat heslo apod.
-
-            // Po úspěšné registraci přesměruj na přihlášení
-            TempData["Success"] = "Registrace proběhla úspěšně! Nyní se přihlaste.";
-            return RedirectToAction("Login");
+            if (ModelState.IsValid)
+            {
+                _context.Users.Add(user);
+                _context.SaveChanges();
+                return RedirectToAction("Login");
+            }
+            return View(user);
         }
 
-        // GET /User/Login
-        [HttpGet]
         public IActionResult Login()
         {
             return View();
         }
 
-        // POST /User/Login
         [HttpPost]
-        public IActionResult Login(string email, string password)
+        public IActionResult Login(string email, string heslo)
         {
-            // TODO: ověřit uživatele v databázi
-
-            // Simulace úspěšného přihlášení – v reálu použij session/cookie/Identity
-            HttpContext.Session.SetString("LoggedInUser", email);
-            return RedirectToAction("Profile");
-        }
-
-        // GET /User/Profile
-        public IActionResult Profile()
-        {
-            // Ochrana stránky – nepřihlášený uživatel bude přesměrován na Login
-            var user = HttpContext.Session.GetString("LoggedInUser");
-            if (string.IsNullOrEmpty(user))
+            var user = _context.Users.FirstOrDefault(u => u.Email == email && u.Heslo == heslo);
+            if (user != null)
             {
-                return RedirectToAction("Login");
+                HttpContext.Session.SetString("UserName", user.Jmeno);
+                return RedirectToAction("Profile");
             }
-
-            ViewBag.Email = user;
+            ViewBag.Chyba = "Špatný email nebo heslo";
             return View();
         }
 
-        // GET /User/Logout
+        public IActionResult Profile()
+        {
+            var jmeno = HttpContext.Session.GetString("UserName");
+            if (jmeno == null) return RedirectToAction("Login");
+            ViewBag.Jmeno = jmeno;
+            return View();
+        }
+
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();

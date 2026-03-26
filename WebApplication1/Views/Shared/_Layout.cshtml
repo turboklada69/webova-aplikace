@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] – Fitness Urban</title>
     <link rel="stylesheet" href="~/css/style.css" />
+    @RenderSection("Styles", required: false)
 </head>
 <body>
 
@@ -17,8 +18,16 @@
                     <li><a asp-controller="Home" asp-action="Kontakty">Kontakty</a></li>
                     <li><a asp-controller="Home" asp-action="Programy">Programy</a></li>
                     <li><a asp-controller="Home" asp-action="Cenik">Ceník</a></li>
-                    <li><a asp-controller="User" asp-action="Register">Registrace</a></li>
-                    <li><a asp-controller="User" asp-action="Login">Přihlásit</a></li>
+                    @if (Context.Session.GetString("UserId") != null)
+                    {
+                        <li><a asp-controller="User" asp-action="Profile">👤 @Context.Session.GetString("UserName")</a></li>
+                        <li><a asp-controller="User" asp-action="Logout">Odhlásit</a></li>
+                    }
+                    else
+                    {
+                        <li><a asp-controller="User" asp-action="Register">Registrace</a></li>
+                        <li><a asp-controller="User" asp-action="Login">Přihlásit</a></li>
+                    }
                 </ul>
             </nav>
         </div>
